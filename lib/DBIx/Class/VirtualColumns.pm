@@ -6,9 +6,11 @@ use warnings;
 
 use base qw(DBIx::Class);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 __PACKAGE__->mk_classdata('_virtual_columns');
+
+=encoding utf8
 
 =head1 NAME
 
@@ -29,22 +31,25 @@ DBIx::Class::VirtualColumns - Add virtual columns to DBIx::Class schemata
  );
  
  __PACKAGE__->table("sometable");
- __PACKAGE__->add_columns('dbcol1','dbcol2', ...);
- __PACKAGE__->add_virtual_columns(w/vcol1 vcol2 vcol3/);
+ __PACKAGE__->add_columns(qw/dbcol1 dbcol2/);
+ __PACKAGE__->add_virtual_columns(qw/vcol1 vcol2 vcol3/);
  
+ # =========================================================
  # Somewhere else
+ 
  my $item = $schema->resultset('Artist')->find($id);
- $item->vcol1('test'); # 
+ $item->vcol1('test'); # Set 'test'
  $item->get_column('vcol1'); # Return 'test'
  
  my $otheritem = $schema->resultset('Artist')->create({
-     dbcol1 => 'value',
-     dbcol2 => 'value',
-     vcol1  => 'value',
-     vcol2  => 'value',
+     dbcol1 => 'value1',
+     dbcol2 => 'value2',
+     vcol1  => 'value3',
+     vcol2  => 'value4',
  });
+ 
+ $otheritem->vcol1(); # Now is 'value3'
 
-  
 =head1 DESCRIPTION
 
 This module allows to specify 'virtual columns' in DBIx::Class schema
@@ -135,8 +140,8 @@ false otherwise.
 sub has_any_column {
     my $self = shift;
     my $column = shift;
-    return $self->_virtual_columns->{$column} || 
-        $self->has_column($column) ? 1:0;
+    return ($self->_virtual_columns->{$column} || 
+        $self->has_column($column)) ? 1:0;
 }
 
 =head2 has_virtual_column
@@ -170,7 +175,7 @@ sub remove_virtual_columns {
 
 =head2 remove_virtual_column
 
-Shortcut for L<remove_virtual_column>
+Shortcut for L<remove_virtual_columns>
 
 =cut
 
@@ -178,12 +183,16 @@ sub remove_virtual_column { shift->remove_virtual_columns(@_) }
 
 =head2 _virtual_filter
 
-Splits attributes for base and virtual columns
+Splits attributes for regular and virtual columns
 
 =cut
 
 sub _virtual_filter {
     my ($self,$attrs) = @_;  
+
+    if ( !$self->_virtual_columns ) {
+        $self->_virtual_columns( {} );
+    }
     
     my $virtual_attrs = {};
     my $main_attrs = {};
@@ -199,7 +208,7 @@ sub _virtual_filter {
 
 =head2 new
 
-Overloaded method. L<DBIx::Class::Row#new>
+Overloaded method. L<DBIx::Class::Row/"new">
 
 =cut
 
@@ -225,7 +234,7 @@ sub new {
 
 =head2 get_column
 
-Overloaded method. L<DBIx::Class::Row#get_colum>
+Overloaded method. L<DBIx::Class::Row/"get_colum">
 
 =cut
 
@@ -243,7 +252,7 @@ sub get_column {
 
 =head2 get_columns
 
-Overloaded method. L<DBIx::Class::Row#get_colums>
+Overloaded method. L<DBIx::Class::Row/"get_colums">
 
 =cut
 
@@ -263,7 +272,7 @@ sub get_columns {
 
 =head2 store_column
 
-Overloaded method. L<DBIx::Class::Row#store_column>
+Overloaded method. L<DBIx::Class::Row/"store_column">
 
 =cut
 
@@ -281,7 +290,7 @@ sub store_column {
 
 =head2 set_column
 
-Overloaded method. L<DBIx::Class::Row#set_column>
+Overloaded method. L<DBIx::Class::Row/"set_column">
 
 =cut
 
@@ -297,7 +306,7 @@ sub set_column {
 
 =head2 column_info
 
-Overloaded method. L<DBIx::Class::ResultSource#column_info>
+Overloaded method. L<DBIx::Class::ResultSource/"column_info">
 
 Additionally returns the HASH key 'virtual' which indicates if the requested
 column is virtual or not.
@@ -323,7 +332,7 @@ sub column_info {
 
 =head2 update
 
-Overloaded method. L<DBIx::Class::Row#update>
+Overloaded method. L<DBIx::Class::Row/"update">
 
 =cut
 
@@ -349,8 +358,9 @@ sub update {
 
 Please report any bugs or feature requests to 
 C<bug-dbix-class-virtualcolumns@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically be 
-notified of progress on your bug as I make changes.
+L<http://rt.cpan.org/Public/Bug/Report.html?Queue=DBIx::Class::VirtualColumns>.
+I will be notified, and then you'll automatically be notified of progress on 
+your report as I make changes.
 
 =head1 AUTHOR
 
@@ -377,4 +387,4 @@ LICENSE file included with this module.
 
 =cut
 
-"This ist virtually the end of the file";
+"This ist virtually the end of the package";
