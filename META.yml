@@ -27,4 +27,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/maros/DBIx-Class-VirtualColumns.git
-version: 1.02
+version: 1.03

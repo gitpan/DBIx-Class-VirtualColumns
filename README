@@ -34,6 +34,9 @@ SYNOPSIS
      });
  
      $otheritem->vcol1(); # Now is 'value3'
+ 
+     # Get the column metadata just like for a regular DBIC column
+     my $info = $result_source->column_info('vcol1');
 
 DESCRIPTION
     This module allows to specify 'virtual columns' in DBIx::Class schema
@@ -45,6 +48,16 @@ DESCRIPTION
     Most DBIx::Class methods like "set_column", "set_columns", "get_column",
     "get_columns", "column_info", ... will work with regular as well as
     virtual columns.
+
+USAGE
+    Use this module if you want to add 'virtual' columns to a DBIC class
+    which behave like real columns (e.g. if you want to use the
+    "set_column", "get_column" methods)
+
+    However if you only want to add non-column data to DBIx::Class::Row
+    objects, then there are easier/better ways:
+
+     __PACKAGE__->mk_group_accessors(simple => qw(foo bar baz));
 
 METHODS
   add_virtual_columns
@@ -66,7 +79,7 @@ METHODS
     *   accessor
 
         Use this to set the name of the accessor method for this column. If
-        unset, the name of the column will be used.
+        not set, the name of the column will be used.
 
   add_virtual_column
     Shortcut for add_virtual_columns
@@ -114,10 +127,21 @@ METHODS
   update
     Overloaded method. "update" in DBIx::Class::Row
 
+CAVEATS
+    The best way to add non-column data to DBIC objects is to use
+    Class::Accessor::Grouped.
+
+     __PACKAGE__->mk_group_accessors(simple => qw(foo bar baz));
+
+    Use DBIx::Class::VirtualColumns only if you rely on DBIx::Class::Row
+    methods like "set_column", "get_column", ...
+
 SUPPORT
-    Please report any bugs or feature requests to
-    "bug-dbix-class-virtualcolumns@rt.cpan.org", or through the web
-    interface at
+    This module was just a proof of concept, and is not actively developed
+    anymore. Patches are still welcome though.
+
+    Please report any bugs to "bug-dbix-class-virtualcolumns@rt.cpan.org",
+    or through the web interface at
     <http://rt.cpan.org/Public/Bug/Report.html?Queue=DBIx::Class::VirtualCol
     umns>. I will be notified, and then you'll automatically be notified of
     progress on your report as I make changes.
